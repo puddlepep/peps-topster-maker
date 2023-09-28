@@ -85,7 +85,10 @@ function loadTopster() {
     f.remove();
 
     f.onchange = function() {
+        console.log(f.files);
+
         f.files[0].text().then(s => {
+            console.log(s);
             JSONToCharts(s);
             drawTopster();
         })
