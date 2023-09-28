@@ -48,6 +48,7 @@ function addChart(name = 'new chart!') {
     charts.push(newChart);
 
     updateSelectorOptions();
+    resizeCanvas();
     return newChart;
 }
 
@@ -63,6 +64,7 @@ function removeChart(idx) {
         addChart();
     }
     updateSelectorOptions();
+    resizeCanvas();
 }
 
 // rename the selected chart

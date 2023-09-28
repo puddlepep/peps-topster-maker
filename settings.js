@@ -5,6 +5,7 @@ const InputTypes = {
     COLOR: "COLOR",
     SUBMIT_FILE: "SUBMIT_FILE",
     BUTTON: "BUTTON",
+    NUMBER: 'NUMBER',
 }
 
 let settings = {}
@@ -56,27 +57,28 @@ function createRangeInput(value, min, max) {
     slider.value = value;
     slider.min = min;
     slider.max = max;
+    
     container.insertAdjacentElement("beforeend", slider);
 
-    const textInput = document.createElement("input");
-    textInput.type = "text";
-    textInput.maxLength = max.toString().length;
-    textInput.value = value;
-    textInput.style.width = 50 + "px";
-    container.insertAdjacentElement("beforeend", textInput);
+    const number = document.createElement("input");
+    number.type = "number";
+    number.maxLength = max.toString().length;
+    number.value = value;
+    number.style.width = 50 + "px";
+    container.insertAdjacentElement("beforeend", number);
 
     let input = {
         type: InputTypes.RANGE,
         range: slider,
-        textInput: textInput,
+        number: number,
         div: container,
 
         onupdate: null,
         get: function() {
-            return Number(this.range.value);
+            return Number(this.number.value);
         },
         set: function(value) {
-            this.textInput.value = value;
+            this.number.value = value;
             this.range.value = value;
 
             if (this.onupdate) this.onupdate();
@@ -88,8 +90,8 @@ function createRangeInput(value, min, max) {
         input.set(slider.value);
     }); 
 
-    textInput.addEventListener("input", function() {
-        input.set(textInput.value);
+    number.addEventListener("input", function() {
+        input.set(number.value);
     });
     return input;
 }
@@ -225,6 +227,43 @@ function createTextInput(text, placeholder=null, size = null) {
     }
     textInput.addEventListener("input", function() {
         input.set(textInput.value);
+    })
+    return input;
+}
+
+function createNumberInput(value, placeholder=null, size=null) {
+
+    const container = document.createElement('div');
+    container.classList.add('input-container');
+    container.style.display = 'inline';
+
+    const number = document.createElement('input');
+    number.type = 'number';
+    number.value = value;
+    number.placeholder = placeholder;
+
+    if (size) {
+        number.style.width = size + 'px';
+    }
+    container.insertAdjacentElement('beforeend', number);
+
+    let input = {
+        type: InputTypes.NUMBER,
+        number: number,
+        div: container,
+
+        onupdate: null,
+        get: function() {
+            return Number(this.number.value);
+        },
+        set: function(value) {
+            this.number.value = value;
+            if (this.onupdate) this.onupdate();
+            drawTopster();
+        }
+    }
+    number.addEventListener('input', function() {
+        input.set(number.value);
     })
     return input;
 }
@@ -398,15 +437,15 @@ function getDefaultInputs() {
 function createDefaultSettings() {
 
     settings.resolution = createSetting("resolution", [
-        createTextInput("1920", "x!", 50),
-        createTextInput("1080", "y!", 50),
+        createNumberInput(1920, "x!", 50),
+        createNumberInput(1080, "y!", 50),
     ])
-    settings.resolution.inputs[0].text.addEventListener("input", function() { resizeCanvas(); });
-    settings.resolution.inputs[1].text.addEventListener("input", function() { resizeCanvas(); })
+    settings.resolution.inputs[0].number.addEventListener("input", function() { resizeCanvas(); });
+    settings.resolution.inputs[1].number.addEventListener("input", function() { resizeCanvas(); })
 
     settings.offset = createSetting("offset", [
-        createTextInput("0", "x!", 50),
-        createTextInput("0", "y!", 50)
+        createNumberInput(0, "x!", 50),
+        createNumberInput(0, "y!", 50)
     ])
 
     insertDivisor();

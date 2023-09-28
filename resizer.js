@@ -38,18 +38,21 @@ function resizeCanvas() {
     canvasScaleX = canvas.width / rect.width;
     canvasScaleY = canvas.height / rect.height;
 
-    let realWidth = canvas.width / canvasScaleX;
-    let realHeight = canvas.height / canvasScaleY;
+    let realWidth = Math.floor(canvas.width / canvasScaleX);
+    let realHeight = Math.floor(canvas.height / canvasScaleY);
+
+    console.log(realHeight, window.innerHeight);
 
     main.style.width = window.innerWidth - sidebarWidth + "px";
     if (realHeight > window.innerHeight) {
         canvas.style.width = "auto";
         canvas.style.height = "100%";
+        console.log('hi')
     }
-
-    if (realWidth > window.innerWidth - sidebarWidth) {
+    else if (realWidth > window.innerWidth - sidebarWidth) {
         canvas.style.width = "100%";
         canvas.style.height = "auto";
+        console.log('hey')
     }
 }
 
