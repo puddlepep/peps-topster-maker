@@ -66,7 +66,8 @@ function beginDrag(album, x, y) {
 
     let size = settings.coverSize.inputs[0].get() / canvasScaleY;
 
-    draggingAlbum = album;
+    draggingAlbum = {...album};
+    draggingAlbum.img = album.img.cloneNode();
     draggingAlbum.img.classList.add("dragging-album");
     draggingAlbum.img.width = size;
     draggingAlbum.img.height = size;
