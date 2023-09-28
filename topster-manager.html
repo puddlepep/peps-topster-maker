@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="topster-manager.css">
+
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+
+    <div id="container">
+      <div id="sidebar">
+        <div id="upper-sidebar">
+          <div id="button-container">
+            <div id="saveload-container">
+              <button id="import-expand">(import)</button>
+              <button id="export-button">export!</button>
+              <button id="load-button">load!</button>
+              <button id="save-button">save!</button>
+              <button id="topsters2-import" disabled="true">import from topsters2! (soon)</button>
+            </div>
+          </div>
+
+          <div id="settings-container"></div>
+        </div>
+        
+        <div id="lower-sidebar">
+          <div id="search-input-div">
+            <input type="text" placeholder="search! :D" id="search-input">
+          </div>
+
+          <div id="search-grid"></div>
+        </div>
+
+      </div>
+      
+      <div id="main">
+        <canvas id="topster-canvas">
+          fallback
+        </canvas>
+
+        <button id="cache-clear">clear image cache? (0 images)</button>
+        <div id="chart-selection-container">
+          <button class="charts-modifier" id="charts-remove">-</button>
+          <select id="chart-selector"></select>
+          <button class="charts-modifier" id="charts-add">+</button>
+
+          <button id="rename-chart-button">rename!</button>
+          <input id="rename-chart-input" type="text" placeholder="new name!"></input>
+        </div>
+
+      </div>
+      
+      <div id="resizer"></div>
+    </div>
+
+  </body>
+</html>
+
+<script src="pako.js"></script>
+<script src="chart.js"></script>
+<script src="settings.js"></script>
+<script src="saveload.js"></script>
+<script src="resizer.js"></script>
+<script src="lastfm.js"></script>
+<script src="topster-manager.js"></script>

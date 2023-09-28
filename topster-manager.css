@@ -1,0 +1,285 @@
+/* color palette */
+:root {
+    --main-color: #4d3b4d;
+    --darker-color: #382b38;
+    --dark-color: #1c161c;
+    --accent-color: #964d96;
+
+    --saveload-height: 50px;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url("fonts/Ubuntu/Ubuntu-Regular.ttf");
+}
+
+body {
+    background-color: rgb(55, 63, 75);
+    font-family: Ubuntu;
+}
+
+/* separate inputs from each other a little bit */
+.input-container {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+input[type="range"] {
+    height: 5px;
+    appearance: none;
+    background: var(--accent-color);
+    margin-right: 2px;
+}
+input[type="range"]::-moz-range-thumb {
+    background: white;
+    margin-top: -5px;
+    border-radius: 0;
+    border: none;
+}
+input[type="range"]:hover {
+    filter: brightness(1.3);
+}
+
+input[type="text"] {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    text-align: center;
+    
+    display: inline;
+    padding: 3px 3px;
+
+    margin-right: 2px;
+    margin-left: 2px;
+}
+input[type="text"]:focus {
+    outline: none;
+    filter: brightness(1.3);
+}
+input[type="text"]:disabled {
+    filter: brightness(0.7);
+}
+
+input[type="color"] {
+    background-color: transparent;
+    /* background-color: var(--accent-color); */
+    border: none;
+    opacity: 1.0;
+}
+
+select {
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    padding: 3px 3px;
+
+    margin-right: 2px;
+    margin-left: 2px;
+}
+select:hover {
+    filter: brightness(1.3);
+}
+
+p.setting-category {
+    margin-bottom: 30px;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 0;
+    text-align: center;
+}
+.setting {
+    font-size: 14px;
+    font-weight: normal;
+    text-align: center;
+    line-height: 0px;
+
+    margin-bottom: 25px;
+}
+hr {
+    margin-bottom: 25px;
+}
+
+.select-disable {
+    user-select: none;
+}
+
+.dragging-album {
+    position: absolute;
+}
+
+#container {
+    height: 100%;
+    width: 100%;
+}
+
+#button-container {
+    text-align: center;
+    background-color: var(--darker-color);
+    height: var(--saveload-height);
+}
+#saveload-container {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+#topsters2-import {
+    margin-top: 5px;
+    display: none;
+}
+#import-expand {
+    background-color: transparent;
+    position: absolute;
+    font-size: 8px;
+
+    transform: translateX(-110%);
+    padding: 0;
+}
+
+button {
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+
+    margin-right: 5px;
+
+}
+button:hover {
+    filter: brightness(1.3);
+}
+button:disabled {
+    filter: brightness(0.7);
+    cursor: auto;
+}
+
+#sidebar {
+    height: 100%;
+    background-color: var(--main-color);
+    position: fixed;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 30%;
+
+    color: white;
+    user-select: none; 
+}
+
+#upper-sidebar {
+    height: 60%;
+}
+#settings-container {
+    overflow-y: scroll;
+    height: calc(100% - var(--saveload-height));
+    margin-right: 5px;
+}
+
+#lower-sidebar {
+    text-align: center;
+    background-color: var(--darker-color);
+
+    height: 40%;
+}
+#search-grid {
+    margin-left: 10px;
+    margin-right: 10px;
+
+    background-color: var(--dark-color);
+    height: calc(100% - 30px);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#search-input-div {
+    height: 30px;
+
+    /* vertically center input */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+#resizer {
+    height: 100%;
+    background-image: url("handle.png");
+    position: absolute;
+
+    left: 29.5%;
+    top: 0;
+    bottom: 0;
+
+    cursor: ew-resize;
+    background-repeat: repeat-y;
+    width: 10px;
+}
+
+
+
+#main {
+    height: 100%;
+    position: fixed;
+
+    left: 30%;
+    top: 0;
+    bottom: 0;
+    width: 70%;
+
+    background-image: url("dither.png");
+}
+#chart-selection-container {
+    margin-left: 20px;
+    margin-top: 20px;
+}
+.charts-modifier {
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+}
+#chart-selector {
+    margin: 0;
+}
+#rename-chart-button {
+    height: 22px;
+    padding: 0;
+    width: 100px;
+    margin: 0;
+
+    display: inline;
+}
+#rename-chart-input {
+    width: 100px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+
+    display: none;
+}
+
+#cache-clear {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+
+    padding: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 22px;
+}
+
+#topster-canvas {
+    width: 100%;
+    /* height: 100%; */
+    position: absolute;
+    margin: 0;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+
+}
