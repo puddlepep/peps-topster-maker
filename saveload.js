@@ -199,4 +199,5 @@ window.addEventListener('load', function() {
 
     resizeCanvas();
     drawTopster();
+    document.body.classList.add('fade');
 })
