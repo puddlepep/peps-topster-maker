@@ -41,18 +41,14 @@ function resizeCanvas() {
     let realWidth = Math.floor(canvas.width / canvasScaleX);
     let realHeight = Math.floor(canvas.height / canvasScaleY);
 
-    console.log(realHeight, window.innerHeight);
-
     main.style.width = window.innerWidth - sidebarWidth + "px";
     if (realHeight > window.innerHeight) {
         canvas.style.width = "auto";
         canvas.style.height = "100%";
-        console.log('hi')
     }
     else if (realWidth > window.innerWidth - sidebarWidth) {
         canvas.style.width = "100%";
         canvas.style.height = "auto";
-        console.log('hey')
     }
 }
 
