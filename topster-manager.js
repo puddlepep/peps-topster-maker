@@ -255,6 +255,7 @@ function drawTopster(newAlbum = null) {
                     newAlbum = null;
                     requireRedraw = true;
                     updateRanks();
+                    cacheChart(getChart());
                 }
                 else if (mouseDown && getChart().covers[coverPos] && draggingAlbum == null) {
                     beginDrag(getChart().covers[coverPos], mousePosition.x, mousePosition.y);

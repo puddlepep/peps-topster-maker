@@ -4,6 +4,13 @@ const exportButton = document.getElementById("export-button");
 const topsters2ImportButton = document.getElementById("topsters2-import");
 let imageDB = null;
 
+function getRandomCacheID() {
+    while (true) {
+        let id = 'chart:' + Math.random().toString().substring(2);
+        if (!localStorage[id]) return id;
+    }
+}
+
 // open topster in new tab when the export button is pressed
 function exportTopster() {
     let dataURL = canvas.toDataURL("image/png");
@@ -14,62 +21,135 @@ function exportTopster() {
     link.remove();
 }
 
-// stringify the charts variable
-function chartsToJSON() {
-    let saveData = {
-        charts: []
+// saves a chart's data to a new chart info object
+function saveChart(chart) {
+
+    let savedChart = {
+        name: chart.name,
+        settings: chart.settings,
+        cacheID: chart.cacheID,
+        covers: {}
+    };
+
+    if (chart.backgroundID) {
+        savedChart.backgroundID = chart.backgroundID;
     }
 
-    for (let chart of charts) {
-
-        let savedChart = {
-            name: chart.name,
-            settings: chart.settings,
-            covers: {},
+    // get covers and save them
+    for (let [pos, cover] of Object.entries(chart.covers)) {
+        savedChart.covers[pos] = {
+            title: cover.title,
+            artist: cover.artist,
+            art: cover.art,
+            rank: cover.rank
         };
-
-        if (chart.backgroundID) {
-            savedChart.backgroundID = chart.backgroundID;
-        }
-
-        // get covers and save them
-        for (let [pos, cover] of Object.entries(chart.covers)) {
-            savedChart.covers[pos] = {
-                title: cover.title,
-                artist: cover.artist,
-                art: cover.art,
-                rank: cover.rank,
-            }
-        }
-        saveData.charts.push(savedChart);
     }
 
-    return JSON.stringify(saveData, null, 4);
+    return savedChart;
 }
 
-function JSONToCharts(json) {
-    let loadData = JSON.parse(json);
+// loads a chart from a chart info object (returned by saveChart)
+function loadChart(chart) {
+    let newChart = addChart(chart.name, chart.cacheID, true);
+    newChart.settings = chart.settings;
 
-    for (let chart of loadData.charts) {
-        let newChart = addChart(chart.name);
-        newChart.settings = chart.settings;
-
-        // load covers
-        for (let [pos, cover] of Object.entries(chart.covers)) {
-            newChart.covers[pos] = createAlbum(cover.artist, cover.title, cover.art, cover.rank);
-        }
-
-        if (chart.backgroundID) {
-            newChart.backgroundID = chart.backgroundID;
-        }
+    // load covers
+    for (let [pos, cover] of Object.entries(chart.covers)) {
+        newChart.covers[pos] = createAlbum(cover.artist, cover.title, cover.art, cover.rank);
     }
-    selectChart(selectedChart);
+
+    if (chart.backgroundID) {
+        newChart.backgroundID = chart.backgroundID;
+    }
+    cacheChart(newChart);
+
+    return newChart;
+}
+
+// turns a chart into a JSON string
+function chartToJSON(chart) {
+    let newChart = saveChart(chart);
+    return JSON.stringify(newChart);
+}
+
+// combines all charts into one big JSON string.
+function chartsToJSON(readable=false) {
+    let newCharts = []
+
+    for (let chart of charts) {
+        let newChart = saveChart(chart);
+        newChart.cacheID = null;
+        newCharts.push(newChart);
+    }
+
+    if (readable) {
+        return JSON.stringify(newCharts, null, 4);
+    }
+    else {
+        return JSON.stringify(newCharts);
+    }
+}
+
+// loads a chart from JSON
+function JSONToChart(json) {
+    let chart = JSON.parse(json);
+    return loadChart(chart);
+}
+
+// loads all charts from a JSON list of charts
+function JSONToCharts(json) {
+    let newCharts = JSON.parse(json);
+    
+    for (let i = 0; i < newCharts.length; i++) {
+        loadChart(newCharts[i]);
+    }
+    cacheOrders();
+}
+
+function clearCache() {
+    for (let key of Object.keys(localStorage)) {
+        delete localStorage[key];
+        console.log(`deleted cache item '${key}'`);
+    }
+}
+
+function cacheOrders() {
+    let orders = {};
+    for (let i = 0; i < charts.length; i++) {
+        orders[charts[i].cacheID] = i;
+    }
+
+    localStorage['chartOrders'] = JSON.stringify(orders);
+}
+
+// save a chart to the cache
+function cacheChart(chart) {
+    let chartJSON = chartToJSON(chart);
+    localStorage[chart.cacheID] = chartJSON;
+}
+
+// load all charts from cache
+function loadCachedCharts() {
+    let items = {...localStorage};
+
+    let keys = Object.keys(items).filter(k => k.startsWith('chart:'));
+    for (let k of keys) {
+        JSONToChart(localStorage[k]);
+    }
+    let ordersJSON = localStorage['chartOrders'];
+    if (ordersJSON) {
+        let orders = JSON.parse(ordersJSON);
+        charts.sort((a, b) => orders[a.cacheID] - orders[b.cacheID]);
+    }
+    reloadChartList();
+    let selected = localStorage['selectedChart'];
+    if (selected) selectChart(selected);
 }
 
 function saveTopster() {
     let a = document.createElement('a');
     a.href = URL.createObjectURL(
-        new Blob([chartsToJSON()], {type:'application/text'})
+        new Blob([chartsToJSON(true)], {type:'application/text'})
     );
     a.download = 'topster.json';
     a.click();
@@ -116,7 +196,7 @@ function importTopsters2() {
     f.onchange = function() { fileReader.readAsText(f.files[0]); }
 }
 
-// expand import functinality
+// expand import functionality
 const importExpand = document.getElementById("import-expand");
 importExpand.addEventListener("click", function() {
     const root = document.querySelector(":root");
@@ -136,18 +216,12 @@ saveButton.addEventListener("click", saveTopster);
 loadButton.addEventListener("click", loadTopster);
 topsters2ImportButton.addEventListener("click", importTopsters2);
 
-window.addEventListener('beforeunload', function() {
-    localStorage['charts'] = chartsToJSON();
-    localStorage['selectedChart'] = selectedChart;
-})
-
 window.addEventListener('load', function() {
 
-    if (localStorage['charts']) {
-        JSONToCharts(localStorage['charts']);
-        selectChart(localStorage['selectedChart']);
-    }
-    else {
+    // load charts from cache
+    // add a default chart if no cache is present
+    loadCachedCharts();
+    if (charts.length == 0) {
         addChart();
     }
 

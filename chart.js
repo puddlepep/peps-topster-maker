@@ -12,58 +12,68 @@ function getChart() {
     return charts[selectedChart];
 }
 
-function selectChart(idx) {
+function selectChart(idx, save=true) {
     if (idx >= charts.length) idx = charts.length - 1; 
     if (idx < 0) idx = 0;
 
     selectedChart = idx;
     chartSelector.selectedIndex = selectedChart;
     let chart = getChart();
+    if (!chart) return;
 
     // update main settings
     for (let [key, setting] of Object.entries(settings)) {
         setting.setAll(chart.settings[setting.name]);
     }
+
+    if (save) localStorage['selectedChart'] = selectedChart;
 }
 
-// update the selector list
-function updateSelectorOptions() {
+function reloadChartList() {
     chartSelector.innerHTML = '';
-
-    for (let chart of charts) {
+    
+    for (let i = 0; i < charts.length; i++) {
         let option = document.createElement('option');
-        option.text = chart.name;
+        option.text = charts[i].name;
         chartSelector.insertAdjacentElement('beforeend', option);
     }
-    selectChart(selectedChart);
 }
 
-function addChart(name = 'new chart!') {
+function addChart(name = 'new chart!', cacheID = null, ignoreOrder = false) {
 
     let newChart = {
         name: name,
         covers: {},
         settings: getDefaultInputs(),
+        cacheID: cacheID,
+    }
+    if (cacheID == null) {
+        newChart.cacheID = getRandomCacheID();
+        cacheChart(newChart);
     }
     charts.push(newChart);
+    if (!ignoreOrder) cacheOrders();
 
-    updateSelectorOptions();
+    reloadChartList();
     resizeCanvas();
     return newChart;
 }
 
 // removes a chart
 function removeChart(idx) {
+    delete localStorage[charts[idx].cacheID];
+
     for (let [pos, cover] of Object.entries(charts[idx].covers)) {
         cover.img.remove();
     }
-
     charts.splice(idx, 1);
+    cacheOrders();
 
     if (charts.length == 0) {
         addChart();
     }
-    updateSelectorOptions();
+
+    reloadChartList();
     resizeCanvas();
 }
 
@@ -73,7 +83,8 @@ function rename() {
     renameInput.value = '';
     charts[selectedChart].name = name;
     endRename();
-    updateSelectorOptions();
+    reloadChartList();
+    selectChart(selectedChart);
 }
 
 // toggle rename mode
@@ -100,4 +111,5 @@ chartAddButton.addEventListener('click', () => {
 
 chartRemoveButton.addEventListener('click', () => {
     removeChart(selectedChart);
+    selectChart(selectedChart);
 });

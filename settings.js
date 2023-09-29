@@ -380,6 +380,7 @@ function createSetting(name, inputs, parentContainer = null) {
     for (let input of inputs) {
         input.onupdate = function() {
             getChart().settings[name] = setting.getAll();
+            cacheChart(getChart());
         }
         container.insertAdjacentElement("beforeend", input.div);
     }
