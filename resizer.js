@@ -33,15 +33,15 @@ function resizeCanvas() {
 
     const sidebarWidth = Number(getComputedStyle(sidebar).width.replace("px",""));
     resizer.style.left = sidebarWidth - 5 + "px";
-
+    main.style.width = window.innerWidth - sidebarWidth + "px";
+    
     let rect = canvas.getBoundingClientRect();
     canvasScaleX = canvas.width / rect.width;
     canvasScaleY = canvas.height / rect.height;
-
+    
     let realWidth = Math.floor(canvas.width / canvasScaleX);
     let realHeight = Math.floor(canvas.height / canvasScaleY);
-
-    main.style.width = window.innerWidth - sidebarWidth + "px";
+    
     if (realHeight > window.innerHeight) {
         canvas.style.width = "auto";
         canvas.style.height = "100%";
@@ -50,6 +50,7 @@ function resizeCanvas() {
         canvas.style.width = "100%";
         canvas.style.height = "auto";
     }
+    console.log('resized');
 }
 
 resizer.addEventListener("mousedown", beginResize);

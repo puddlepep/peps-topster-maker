@@ -164,6 +164,9 @@ function drawTopster(newAlbum = null) {
     const gridHeight = coverSize * height + coverSeparation * height;
 
     let rect = canvas.getBoundingClientRect();
+    canvasScaleX = canvas.width / rect.width;
+    canvasScaleY = canvas.height / rect.height;
+
     let newMpX = (mousePosition.x - rect.x) * canvasScaleX;
     let newMpY = (mousePosition.y - rect.y) * canvasScaleY;
 
