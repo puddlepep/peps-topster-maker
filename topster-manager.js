@@ -397,5 +397,5 @@ function drawTopster(newAlbum = null) {
     }
 }
 
-new FontFace("Ubuntu", "url('fonts/Ubuntu/Ubuntu-Regular.ttf')").load();
+new FontFace("Ubuntu", "url('assets/fonts/Ubuntu/Ubuntu-Regular.ttf')").load();
 createDefaultSettings();

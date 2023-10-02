@@ -10,7 +10,7 @@
 
 @font-face {
     font-family: Ubuntu;
-    src: url("fonts/Ubuntu/Ubuntu-Regular.ttf");
+    src: url("assets/fonts/Ubuntu/Ubuntu-Regular.ttf");
 }
 
 body {
@@ -210,7 +210,7 @@ button:disabled {
 
 #resizer {
     height: 100%;
-    background-image: url("handle.png");
+    background-image: url("assets/art/handle.png");
     position: absolute;
 
     left: 29.5%;
@@ -233,7 +233,7 @@ button:disabled {
     bottom: 0;
     width: 70%;
 
-    background-image: url("dither.png");
+    background-image: url("assets/art/dither.png");
 }
 #chart-selection-container {
     margin-left: 20px;
