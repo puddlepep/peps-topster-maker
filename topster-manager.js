@@ -76,15 +76,15 @@ function beginDrag(album, x, y) {
     draggingAlbum.img.remove();
     document.body.insertAdjacentElement("beforeend", draggingAlbum.img);
 
-    draggingAlbum.img.style.marginLeft = x-(size/2.0)+"px";
-    draggingAlbum.img.style.marginTop = y-(size/2.0)+"px";
+    draggingAlbum.img.style.left = x - (size/2.0) +"px";
+    draggingAlbum.img.style.top = y - (size/2.0) +"px";
 
     draggingAlbum.redraw = function(event) {
         drawTopster();
     }
     draggingAlbum.onMove = function(event) {
-        draggingAlbum.img.style.marginLeft = (event.clientX - (size/2.0)) + "px";
-        draggingAlbum.img.style.marginTop = (event.clientY - (size/2.0)) + "px";
+        draggingAlbum.img.style.left = (event.clientX - (size / 2.0)) + "px";
+        draggingAlbum.img.style.top = (event.clientY - (size / 2.0)) + "px";
     }
     draggingAlbum.onUp = function(event) {
         document.removeEventListener("mouseup", draggingAlbum.onUp);
