@@ -2,27 +2,50 @@ const resizer = document.getElementById("resizer");
 let canvasScaleX = 1;
 let canvasScaleY = 1;
 
-function beginResize() {
-    document.addEventListener("mouseup", endResize);
-    document.addEventListener("mousemove", resizeSidebar);
-    document.body.style.cursor = "ew-resize";
+function beginResize(e) {
+    if (e.type == "mousedown") {
+        document.addEventListener("mouseup", endResize);
+        document.addEventListener("mousemove", resizeSidebar);
+        document.body.style.cursor = "ew-resize";
+    }
+    else if (e.type == "touchstart") {
+        document.addEventListener("touchend", endResize);
+        document.addEventListener("touchmove", resizeSidebar);
+    }
 }
 
-function endResize() {
-    document.removeEventListener("mouseup", endResize);
-    document.removeEventListener("mousemove", resizeSidebar);
-    document.body.style.cursor = "";
+function endResize(e) {
+    if (e.type == "mouseup") {
+        document.removeEventListener("mouseup", endResize);
+        document.removeEventListener("mousemove", resizeSidebar);
+        document.body.style.cursor = "";
+    }
+    else if (e.type == "touchend") {
+        document.removeEventListener("touchend", endResize);
+        document.removeEventListener("touchmove", resizeSidebar);
+    }
 }
 
-function resizeSidebar(event) {
+function resizeSidebar(e) {
+
+    let x, y = 0;
+    if (e.type == "mousemove") {
+        x = e.clientX;
+        y = e.clientY;
+    }
+    else if (e.type == "touchmove") {
+        x = e.changedTouches[0].clientX;
+        y = e.changedTouches[0].clientY;
+    }
+
     const sidebar = document.getElementById("sidebar");
     const main = document.getElementById("main");
 
     const width = window.innerWidth;
     const height = window.innerHeight;
 
-    sidebar.style.width = event.clientX + "px";
-    main.style.left = event.clientX + "px";
+    sidebar.style.width = x + "px";
+    main.style.left = x + "px";
 
     resizeCanvas();
 }
@@ -50,8 +73,9 @@ function resizeCanvas() {
         canvas.style.width = "100%";
         canvas.style.height = "auto";
     }
-    console.log('resized');
 }
 
 resizer.addEventListener("mousedown", beginResize);
+resizer.addEventListener("touchstart", beginResize);
+
 window.addEventListener("resize", resizeCanvas);
