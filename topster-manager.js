@@ -117,19 +117,24 @@ function beginDrag(album, x, y) {
 
 // track mouse position for cover placement
 let mousePosition = {"x": 0, "y": 0}
-document.addEventListener("mousemove", function(event) {
-    mousePosition.x = event.clientX;
-    mousePosition.y = event.clientY;
-});
-document.addEventListener("touchmove", function(event) {
-    mousePosition.x = event.changedTouches[0].clientX;
-    mousePosition.y = event.changedTouches[0].clientY;
-})
+function moveMouse(event) {
+    if (event.type == "mousemove" || event.type == "mousedown") {
+        mousePosition.x = event.clientX;
+        mousePosition.y = event.clientY;
+    }
+    else if (event.type == "touchmove" || event.type == "touchstart") {
+        mousePosition.x = event.touches[0].clientX;
+        mousePosition.y = event.touches[0].clientY;
+    }
+}
+document.addEventListener("mousemove", moveMouse);
+document.addEventListener("touchmove", moveMouse);
 
 // handle clicking on the canvas
 let mouseDown = false;
 let previousPosition = null; // if dragging an already-placed cover
-function topsterClick() {
+function topsterClick(event) {
+    moveMouse(event);
     mouseDown = true;
     drawTopster();
     mouseDown = false;
