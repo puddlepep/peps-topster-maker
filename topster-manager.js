@@ -53,6 +53,9 @@ searchInput.addEventListener("keydown", function(event) {
                 newAlbum.img.onmousedown = function(event) {
                     beginDrag(newAlbum, event.clientX, event.clientY);
                 }
+                newAlbum.img.ontouchstart = function(event) {
+                    beginDrag(newAlbum, event.touches[0].clientX, event.touches[0].clientY);
+                }
                 searchAlbums.push(newAlbum);
             }
 
@@ -83,19 +86,33 @@ function beginDrag(album, x, y) {
         drawTopster();
     }
     draggingAlbum.onMove = function(event) {
-        draggingAlbum.img.style.left = (event.clientX - (size / 2.0)) + "px";
-        draggingAlbum.img.style.top = (event.clientY - (size / 2.0)) + "px";
+        let x, y = 0;
+        if (event.type == "mousemove") {
+            x = event.clientX;
+            y = event.clientY;
+        }
+        else if (event.type == "touchmove") {
+            x = event.changedTouches[0].clientX;
+            y = event.changedTouches[0].clientY;
+        }
+
+        draggingAlbum.img.style.left = (x - (size / 2.0)) + "px";
+        draggingAlbum.img.style.top = (y - (size / 2.0)) + "px";
     }
     draggingAlbum.onUp = function(event) {
         document.removeEventListener("mouseup", draggingAlbum.onUp);
+        document.removeEventListener("touchend", draggingAlbum.onUp);
         document.removeEventListener("mousemove", draggingAlbum.onMove);
+        document.removeEventListener("touchmove", draggingAlbum.onMove);
         draggingAlbum.img.style.display = "none";
         drawTopster(draggingAlbum);
         draggingAlbum = null;
         previousPosition = null;
     }
     document.addEventListener("mousemove", draggingAlbum.onMove);
+    document.addEventListener("touchmove", draggingAlbum.onMove);
     document.addEventListener("mouseup", draggingAlbum.onUp);
+    document.addEventListener("touchend", draggingAlbum.onUp);
 }
 
 // track mouse position for cover placement
@@ -104,15 +121,21 @@ document.addEventListener("mousemove", function(event) {
     mousePosition.x = event.clientX;
     mousePosition.y = event.clientY;
 });
+document.addEventListener("touchmove", function(event) {
+    mousePosition.x = event.changedTouches[0].clientX;
+    mousePosition.y = event.changedTouches[0].clientY;
+})
 
 // handle clicking on the canvas
 let mouseDown = false;
 let previousPosition = null; // if dragging an already-placed cover
-canvas.addEventListener("mousedown", function(event) {
+function topsterClick() {
     mouseDown = true;
     drawTopster();
     mouseDown = false;
-})
+}
+canvas.addEventListener("mousedown", topsterClick);
+canvas.addEventListener("touchstart", topsterClick);
 
 function updateRanks() {
     let rank = 1;
