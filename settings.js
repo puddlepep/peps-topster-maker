@@ -238,7 +238,7 @@ function createNumberInput(value, placeholder=null, size=null) {
     container.style.display = 'inline';
 
     const number = document.createElement('input');
-    number.type = 'number';
+    number.type = 'text';
     number.value = value;
     number.placeholder = placeholder;
 
