@@ -142,13 +142,14 @@ function topsterClick(event) {
 canvas.addEventListener("mousedown", topsterClick);
 canvas.addEventListener("touchstart", topsterClick);
 
-function updateRanks() {
+function updateRanks(chart) {
     let rank = 1;
-    for (let y = 0; y < settings.gridSize.inputs[1].get(); y++) {
-        for (let x = 0; x < settings.gridSize.inputs[0].get(); x++) {
-            if (getChart().covers[x + "-" + y]) {
-               getChart().covers[x + "-" + y].rank = rank;
-               rank++; 
+    for (let y = 0; y < chart.settings['grid size'][1]; y++) {
+        for (let x = 0; x < chart.settings['grid size'][0]; x++) {
+            let key = x + '-' + y;
+            if (key in chart.covers) {
+                chart.covers[key].rank = rank;
+                rank++; 
             }
         }
     }
@@ -285,7 +286,7 @@ function drawTopster(newAlbum = null) {
 
                     newAlbum = null;
                     requireRedraw = true;
-                    updateRanks();
+                    updateRanks(getChart());
                     cacheChart(getChart());
                 }
                 else if (mouseDown && getChart().covers[coverPos] && draggingAlbum == null) {
@@ -293,7 +294,7 @@ function drawTopster(newAlbum = null) {
                     delete getChart().covers[coverPos];
                     previousPosition = {"x": x, "y": y};
                     requireRedraw = true;
-                    updateRanks();
+                    updateRanks(getChart());
                 }
         }
     }

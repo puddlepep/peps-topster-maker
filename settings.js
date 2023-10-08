@@ -432,7 +432,7 @@ function getAllInputs() {
 }
 
 function getDefaultInputs() {
-    return {...defaultInputs};
+    return structuredClone(defaultInputs);
 }
 
 function createDefaultSettings() {
@@ -526,21 +526,26 @@ function createDefaultSettings() {
     settings.background.inputs[2].onupload = function(file) {
         const reader = new FileReader();
         reader.addEventListener("load", () => {
-            let store = imageDB.transaction('images', 'readwrite').objectStore('images');
-            let trans = store.add(reader.result);
-
-            trans.onsuccess = function() {
-
-                if (getChart().backgroundID) {
-                    store.delete(getChart().backgroundID);
-                    delete getChart().background;
-                }
-
-                getChart().backgroundID = trans.result;
-                drawTopster();
-            }
+            storeImage(getChart(), reader.result);
         });
         reader.readAsDataURL(file);
     }
     defaultInputs = getAllInputs();
+}
+
+function storeImage(chart, dataURL) {
+
+    let store = imageDB.transaction('images', 'readwrite').objectStore('images');
+    let trans = store.add(dataURL);
+
+    trans.onsuccess = function() {
+
+        if (chart.backgroundID) {
+            store.delete(chart.backgroundID);
+            delete chart.background;
+        }
+
+        chart.backgroundID = trans.result;
+        drawTopster();
+    }    
 }

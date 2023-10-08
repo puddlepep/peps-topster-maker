@@ -181,6 +181,7 @@ function importTopsters2() {
     f.remove();
     
     // thanks topsters3 for the help here, lol.
+    // https://github.com/camdendotlol/topstersorg/blob/4e681ce1b54b11a2afb8ac1dbd481336be66a0aa/src/components/Sidebar/Imports.vue
     // fuck topsters2
     const fileReader = new FileReader();
     fileReader.addEventListener("load", () => {
@@ -190,8 +191,98 @@ function importTopsters2() {
         .join(""))
 
         let t2Data = JSON.parse(unshifted)[0];
+        let options = JSON.parse(t2Data.options);
 
-        console.log(t2Data["cards"]);
+        for (let chart of Object.entries(options.charts)) {
+            let prefix = chart[0] + '-';
+            if (prefix == 'cards-') prefix = '';
+            
+            let name = chart[1];
+            const newChart = addChart(name);
+
+            let custom = JSON.parse(t2Data[prefix + 'custom']);
+
+            // set proper size
+            let size = t2Data[prefix + 'size'];
+            if (size == '25') {
+                newChart.settings['grid size'][0] = custom.columns;
+                newChart.settings['grid size'][1] = custom.rows;
+            }
+            else if (size == '40') {
+                newChart.settings['grid size'][0] = 8;
+                newChart.settings['grid size'][1] = 5;
+            }
+            else if (size == '42') {
+                newChart.settings['grid size'][0] = 7;
+                newChart.settings['grid size'][1] = 6;
+            }
+            else if (size == '100') {
+                newChart.settings['grid size'][0] = 10;
+                newChart.settings['grid size'][1] = 10;
+            }
+            
+            // set background
+            let background = t2Data[prefix + 'background'];
+            
+            if (background.startsWith('#')) {
+
+                // convert 3-digit hex codes (?) to 6-digit ones
+                let color = "#";
+                for (let i = 1; i < background.length; i++) {
+                    color = color + background[i] + background[i];
+                }
+
+                newChart.settings['background'][0] = 'color';
+                newChart.settings['background'][1] = { color: color, alpha: 1.0 };
+            }
+            else {
+                try {
+                    newChart.settings['background'][0] = 'image';
+                    let backgroundURL = background.match(/url\("(.+?)"\)/)[1];
+    
+                    (async function() {
+                        let blob = await fetch(backgroundURL).then(r => r.blob());
+    
+                        let reader = new FileReader();
+                        reader.onload = function() {
+                            storeImage(newChart, reader.result);
+                        }
+                        reader.readAsDataURL(blob);
+                    })();
+                }
+                catch {}
+            }
+
+            // load cards
+            let textDecoder = new TextDecoder();
+            let cardsB64 = t2Data[prefix + 'cards'] // Get base64 string
+            let cardsCompressed = Uint8Array.from(atob(cardsB64.substring(1, cardsB64.length - 1)), c => c.charCodeAt(0)) // Convert base64 to bytes
+            let cardsDecompressed = textDecoder.decode(pako.inflate(cardsCompressed)) // Decompress and convert to text
+            
+            let cards = JSON.parse(cardsDecompressed) // Parse cards
+            for (let i = 0; i < cards.length; i++) {
+                if (cards[i].src == '') continue;
+
+                searchLastFM(cards[i].title).then(results => {
+
+                    let album = results[0];
+                    let w = newChart.settings['grid size'][0];
+                    let h = newChart.settings['grid size'][1];
+
+                    let x = i % w;
+                    let y = Math.floor(i / w);
+
+                    newChart.covers[x + '-' + y] = createAlbum(album.artist, album.name, album.image[album.image.length - 1]["#text"]);
+                    updateRanks(newChart);
+                    cacheChart(newChart);
+                });
+            }
+            newChart.settings['font size'][1] = t2Data[prefix + 'titled'] == "true" ? "shown" : "hidden";
+            if (t2Data[prefix + 'numbered'] == 'false') {
+                newChart.settings['text format'][0] = newChart.settings['text format'][0].replace('{rank}. ', '');
+            }
+            cacheChart(newChart);
+        }
     });
     f.onchange = function() { fileReader.readAsText(f.files[0]); }
 }
