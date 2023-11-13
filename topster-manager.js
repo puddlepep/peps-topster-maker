@@ -7,9 +7,20 @@ const canvas = document.getElementById("topster-canvas");
 
 // create an album object with info
 function createAlbum(artist, title, art, rank = -1) {
-
+    
     let img = document.createElement("img");
+    function reloadCover() {
+        img.onerror = null;
+
+        img.src = "";
+        searchLastFM(artist + " " + title).then(albumsFound => {
+            let album = albumsFound[0];
+            img.src = album.image[album.image.length - 1]["#text"];
+        });
+    }
+
     img.classList.add("select-disable");
+    img.onerror = function() { reloadCover(); };
     img.src = art;
     img.width = 100;
     img.height = 100;
